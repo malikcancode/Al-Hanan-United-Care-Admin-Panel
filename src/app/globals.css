@@ -1,26 +1,189 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Shares the website's tokens so the admin feels like the same clinic */
+@theme {
+  --color-brand-50: #eef6f4;
+  --color-brand-100: #d6ebe6;
+  --color-brand-200: #acd6cd;
+  --color-brand-500: #13867a;
+  --color-brand-600: #0e6f65;
+  --color-brand-700: #0b5a52;
+  --color-brand-800: #0a4842;
+  --color-brand-900: #0a3431;
+
+  --color-ink: #11262a;
+  --color-ink-soft: #2b3f43;
+  --color-muted: #566a6d;
+  --color-line: #e1e7e6;
+  --color-line-strong: #c9d3d1;
+  --color-canvas: #f4f6f5;
+
+  /* Data marks: validated for chroma and contrast on white */
+  --color-chart: #0b9a88;
+
+  --color-danger: #b42318;
+  --color-danger-bg: #fef3f2;
+
+  --font-sans: var(--font-public-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-source-serif), ui-serif, Georgia, serif;
+
+  --shadow-soft: 0 1px 2px rgb(17 38 42 / 0.05);
+  --shadow-lift: 0 4px 8px -2px rgb(17 38 42 / 0.06), 0 24px 48px -12px rgb(17 38 42 / 0.22);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scrollbar-color: var(--color-line-strong) transparent;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  body {
+    @apply bg-canvas font-sans text-ink antialiased;
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    caret-color: var(--color-brand-600);
+  }
+
+  ::selection {
+    background: var(--color-brand-100);
+    color: var(--color-brand-900);
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply text-ink;
+    text-wrap: balance;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand-600);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@utility btn {
+  @apply inline-flex h-10 items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold whitespace-nowrap transition-[background-color,border-color,color] duration-150 disabled:cursor-not-allowed disabled:opacity-55;
+}
+
+@utility btn-sm {
+  @apply h-8 gap-1.5 rounded-md px-3 text-[0.8125rem];
+}
+
+@utility btn-primary {
+  @apply btn bg-brand-600 text-white shadow-[0_1px_2px_rgb(10_52_49/0.2)] hover:bg-brand-700 active:bg-brand-800;
+}
+
+@utility btn-secondary {
+  @apply btn border border-line-strong bg-white text-ink hover:border-muted/60 hover:bg-canvas;
+}
+
+@utility btn-ghost {
+  @apply btn text-ink-soft hover:bg-canvas hover:text-ink;
+}
+
+@utility btn-danger {
+  @apply btn bg-danger text-white hover:bg-[#912018];
+}
+
+@utility btn-danger-ghost {
+  @apply btn text-danger hover:bg-danger-bg;
+}
+
+@utility icon-btn {
+  @apply inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted transition-colors hover:bg-canvas hover:text-ink;
+}
+
+@utility field-label {
+  @apply mb-1.5 block text-[0.8125rem] font-semibold text-ink-soft;
+}
+
+@utility field-hint {
+  @apply mt-1.5 text-[0.8125rem] text-muted;
+}
+
+@utility field-input {
+  /* 16px on phones prevents iOS zoom, 15px on larger screens */
+  @apply block min-h-10 w-full appearance-none rounded-lg border border-line-strong bg-white px-3 py-2 text-base text-ink transition-[border-color,box-shadow] duration-150 outline-none placeholder:text-muted/70 hover:border-muted/70 focus:border-brand-600 focus:ring-4 focus:ring-brand-600/15 disabled:bg-canvas sm:text-[0.9375rem];
+}
+
+@utility card {
+  @apply rounded-xl border border-line bg-white shadow-soft;
+}
+
+select.field-input {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23566a6d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.7rem center;
+  background-size: 1rem;
+  padding-right: 2.25rem;
+}
+
+textarea.field-input {
+  @apply py-2.5;
+  resize: vertical;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* Chart entrance: columns rise from the baseline, horizontal bars grow from the left */
+@keyframes grow-up {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes grow-right {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@utility animate-grow-up {
+  transform-origin: bottom;
+  animation: grow-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@utility animate-grow-right {
+  transform-origin: left;
+  animation: grow-right 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@utility animate-fade {
+  animation: fade-in 0.15s ease-out both;
+}
+
+@utility animate-dialog {
+  animation: dialog-in 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@utility animate-toast {
+  animation: toast-in 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
